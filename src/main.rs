@@ -15,6 +15,7 @@ use docopt::Docopt;
 use sdl2::keyboard::Keycode;
 use sdl2::event::Event;
 use chip8::Chip8;
+use std::path::Path;
 
 const USAGE: &'static str = "
 Chip8 Emulator
@@ -42,11 +43,18 @@ fn main() {
              .decode())
         .unwrap_or_else(|e| e.exit());
 
+    let path = Path::new(&args.arg_file);
+
+    if !path.is_file() {
+        println!("Not a valid file");
+        return;
+    }
+
     let ctx = sdl2::init().unwrap();
     let mut chip8 = Chip8::new(&ctx);
     let mut events = ctx.event_pump().unwrap();
 
-    chip8.load_rom(&args.arg_file);
+    chip8.load_rom(&path);
 
     'main: loop {
         for event in events.poll_iter() {

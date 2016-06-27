@@ -71,16 +71,18 @@ impl<'a> Chip8<'a> {
         }
     }
 
-    pub fn load_rom(&mut self, path: &str) {
+    pub fn load_rom<P: AsRef<Path>>(&mut self, path: P) {
         let mut rom: Vec<u8> = Vec::new();
-        let mut file = File::open(Path::new(path)).unwrap();
+        let mut file = File::open(path).unwrap();
         file.read_to_end(&mut rom).unwrap();
-        for i in 0usize..rom.len() {
-            self.mem[0x200 + i] = rom[i]; 
+        for (i, &item) in rom.iter().enumerate() {
+            let val = 0x200;
+            self.mem[val + i] = item; 
         }
         // TODO: move this
-        for i in 0usize..FONT_SET.len() {
-            self.mem[0x00 + i] = FONT_SET[i];
+        for (i, &item) in  FONT_SET.iter().enumerate() {
+            let val = 0x00;
+            self.mem[val + i] = item;
         }
     }
 
@@ -372,7 +374,7 @@ impl<'a> Chip8<'a> {
                 if self.screen.buffer[(j/10)+(i/10)*64] == 1 {
                     self.screen.renderer.fill_rect(
                         Rect::new(j as i32, i as i32, 1, 1)
-                        );
+                        ).unwrap();
                 }
             }
         }
