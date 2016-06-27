@@ -44,11 +44,11 @@ enum_from_primitive! {
 #[derive(Default)]
 pub struct Instruction {
     pub opcode: u16,
-    pub nnn:    u16,
-    pub kk:     u8,
-    pub x:      usize, 
-    pub y:      usize,
-    pub n:      u8,
+    pub nnn: u16,
+    pub kk: u8,
+    pub x: usize,
+    pub y: usize,
+    pub n: u8,
 }
 
 impl Instruction {
@@ -56,43 +56,43 @@ impl Instruction {
         Instruction::default()
     }
 
-    pub fn decode(&mut self, data: (u8,u8)) {
+    pub fn decode(&mut self, data: (u8, u8)) {
         let fstb = data.0;
         let sndb = data.1;
 
         let op = fstb as u16 >> 4;
 
         match op {
-            0x00                                => {
+            0x00 => {
                 self.opcode = op << 12 | sndb as u16;
-            },
-            0x01 | 0x02 | 0x0a | 0x0b           => {
+            }
+            0x01 | 0x02 | 0x0a | 0x0b => {
                 self.opcode = op << 12;
-                self.nnn    = (fstb as u16 & 0x0F) << 8 | sndb as u16;
-            },
-            0x03 | 0x04 | 0x06 | 0x07 | 0x0c    => {
+                self.nnn = (fstb as u16 & 0x0F) << 8 | sndb as u16;
+            }
+            0x03 | 0x04 | 0x06 | 0x07 | 0x0c => {
                 self.opcode = op << 12;
-                self.x      = (fstb & 0x0F) as usize;
-                self.kk     = sndb;
-            },
-            0x05 | 0x08 | 0x09                  => {
+                self.x = (fstb & 0x0F) as usize;
+                self.kk = sndb;
+            }
+            0x05 | 0x08 | 0x09 => {
                 self.opcode = op << 12 | sndb as u16 & 0x0F;
-                self.x      = (fstb & 0x0F) as usize;
-                self.y      = ((sndb & 0xF0) >> 4) as usize;
-            },
-            0x0e | 0x0f                         => {
+                self.x = (fstb & 0x0F) as usize;
+                self.y = ((sndb & 0xF0) >> 4) as usize;
+            }
+            0x0e | 0x0f => {
                 self.opcode = op << 12 | sndb as u16;
-                self.x      = (fstb & 0x0F) as usize;
-            },
-            0x0d                                => {
+                self.x = (fstb & 0x0F) as usize;
+            }
+            0x0d => {
                 self.opcode = op << 12;
-                self.x      = (fstb & 0x0F) as usize;
-                self.y      = ((sndb & 0xF0) >> 4) as usize;
-                self.n      = sndb & 0x0F;
-            },
-            _                                   => {
+                self.x = (fstb & 0x0F) as usize;
+                self.y = ((sndb & 0xF0) >> 4) as usize;
+                self.n = sndb & 0x0F;
+            }
+            _ => {
                 self.opcode = 0xFFFF;
-            },
+            }
         }
     }
 }

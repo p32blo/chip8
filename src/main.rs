@@ -5,7 +5,8 @@ extern crate docopt;
 extern crate sdl2;
 extern crate num;
 extern crate rand;
-#[macro_use] extern crate enum_primitive as ep;
+#[macro_use]
+extern crate enum_primitive as ep;
 
 mod chip8;
 mod screen;
@@ -38,9 +39,10 @@ struct Args {
 fn main() {
 
     let args: Args = Docopt::new(USAGE)
-        .and_then(|d|
-            d.version(Some(format!("{} v{}", env!("CARGO_PKG_NAME"),  env!("CARGO_PKG_VERSION"))))
-             .decode())
+        .and_then(|d| {
+            d.version(Some(format!("{} v{}", env!("CARGO_PKG_NAME"), env!("CARGO_PKG_VERSION"))))
+                .decode()
+        })
         .unwrap_or_else(|e| e.exit());
 
     let path = Path::new(&args.arg_file);
@@ -59,30 +61,28 @@ fn main() {
     'main: loop {
         for event in events.poll_iter() {
             match event {
-                Event::Quit{..} => break 'main,
-                Event::KeyDown {
-                    keycode: Some(key), ..
-                } => {
+                Event::Quit { .. } => break 'main,
+                Event::KeyDown { keycode: Some(key), .. } => {
                     chip8.reset_keys();
                     match key {
                         Keycode::Num1 => chip8.press(0x1),
                         Keycode::Num2 => chip8.press(0x2),
                         Keycode::Num3 => chip8.press(0x3),
                         Keycode::Num4 => chip8.press(0xc),
-                        Keycode::Q    => chip8.press(0x4),
-                        Keycode::W    => chip8.press(0x5),
-                        Keycode::E    => chip8.press(0x6),
-                        Keycode::R    => chip8.press(0xd),
-                        Keycode::A    => chip8.press(0x7),
-                        Keycode::S    => chip8.press(0x8),
-                        Keycode::D    => chip8.press(0x9),
-                        Keycode::Z    => chip8.press(0x0),
-                        Keycode::X    => chip8.press(0xb),
-                        Keycode::F    => chip8.press(0xf),
-                        _             => {},
+                        Keycode::Q => chip8.press(0x4),
+                        Keycode::W => chip8.press(0x5),
+                        Keycode::E => chip8.press(0x6),
+                        Keycode::R => chip8.press(0xd),
+                        Keycode::A => chip8.press(0x7),
+                        Keycode::S => chip8.press(0x8),
+                        Keycode::D => chip8.press(0x9),
+                        Keycode::Z => chip8.press(0x0),
+                        Keycode::X => chip8.press(0xb),
+                        Keycode::F => chip8.press(0xf),
+                        _ => {}
                     }
-                },
-                _                 => {},
+                }
+                _ => {}
             }
         }
 

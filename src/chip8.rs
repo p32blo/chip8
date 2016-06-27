@@ -13,6 +13,7 @@ use ep::FromPrimitive;
 use screen::Screen;
 use instruction::{Opcodes, Instruction};
 
+#[cfg_attr(rustfmt, rustfmt_skip)]
 const FONT_SET: [u8; 80] = [
     0xf0, 0x90, 0x90, 0x90, 0xf0, // 0
     0x20, 0x60, 0x20, 0x20, 0x70, // 1
@@ -33,18 +34,18 @@ const FONT_SET: [u8; 80] = [
 ];
 
 pub struct Chip8<'a> {
-    regs:   [u8; 16],
-    i:      u16, 
-    dt:     u8,
-    st:     u8,
-    pc:     usize,
+    regs: [u8; 16],
+    i: u16,
+    dt: u8,
+    st: u8,
+    pc: usize,
 
-    inst:   Instruction,
-    jmp:    bool,
+    inst: Instruction,
+    jmp: bool,
 
-    keys:   [u8; 16],
-    mem:    [u8; 4096],
-    stack:  Vec<usize>,
+    keys: [u8; 16],
+    mem: [u8; 4096],
+    stack: Vec<usize>,
     screen: Screen<'a>,
 }
 
@@ -57,16 +58,16 @@ impl<'a> Debug for Chip8<'a> {
 impl<'a> Chip8<'a> {
     pub fn new(sdl: &Sdl) -> Chip8<'a> {
         Chip8 {
-            regs:   [0; 16],
-            i:      0,
-            dt:     0,
-            st:     0,
-            pc:     0x200,
-            inst:   Instruction::new(),
-            jmp:    false,
-            keys:   [0; 16],
-            mem:    [0; 4096], 
-            stack:  vec![],
+            regs: [0; 16],
+            i: 0,
+            dt: 0,
+            st: 0,
+            pc: 0x200,
+            inst: Instruction::new(),
+            jmp: false,
+            keys: [0; 16],
+            mem: [0; 4096],
+            stack: vec![],
             screen: Screen::new(sdl),
         }
     }
@@ -77,65 +78,71 @@ impl<'a> Chip8<'a> {
         file.read_to_end(&mut rom).unwrap();
         for (i, &item) in rom.iter().enumerate() {
             let val = 0x200;
-            self.mem[val + i] = item; 
+            self.mem[val + i] = item;
         }
         // TODO: move this
-        for (i, &item) in  FONT_SET.iter().enumerate() {
+        for (i, &item) in FONT_SET.iter().enumerate() {
             let val = 0x00;
             self.mem[val + i] = item;
         }
     }
 
     pub fn run(&mut self) {
-        let raw_data = (self.mem[self.pc], self.mem[self.pc +1]); 
-        self.inst.decode(raw_data); 
+        let raw_data = (self.mem[self.pc], self.mem[self.pc + 1]);
+        self.inst.decode(raw_data);
 
-        self.jmp  = false;
+        self.jmp = false;
 
         // println!("{:#x}: {:#x}", self.pc, self.inst.opcode);
 
         match Opcodes::from_u16(self.inst.opcode).unwrap() {
-            Opcodes::CLS    => self.cls(),
-            Opcodes::RET    => self.ret(),
-            Opcodes::JMP    => self.jmp(),
+            Opcodes::CLS => self.cls(),
+            Opcodes::RET => self.ret(),
+            Opcodes::JMP => self.jmp(),
             Opcodes::JMP_VA => self.jmp_va(),
-            Opcodes::CALL   => self.call(),
-            Opcodes::SE_VB  => self.se_vb(),
-            Opcodes::SE_VV  => self.se_vv(),
+            Opcodes::CALL => self.call(),
+            Opcodes::SE_VB => self.se_vb(),
+            Opcodes::SE_VV => self.se_vv(),
             Opcodes::SNE_VB => self.sne_vb(),
             Opcodes::SNE_VV => self.sne_vv(),
-            Opcodes::OR     => self.or(),
+            Opcodes::OR => self.or(),
             Opcodes::ADD_VB => self.add_vb(),
             Opcodes::ADD_VV => self.add_vv(),
             Opcodes::ADD_IV => self.add_iv(),
-            Opcodes::SUB    => self.sub(),
-            Opcodes::SUBN   => self.subn(),
-            Opcodes::XOR    => self.xor(),
-            Opcodes::AND    => self.and(),
-            Opcodes::LD_VB  => self.ld_vb(),
-            Opcodes::LD_BV  => self.ld_bv(),
-            Opcodes::LD_VV  => self.ld_vv(),
-            Opcodes::LD_VI  => self.ld_vi(),
-            Opcodes::LD_VK  => self.ld_vk(),
-            Opcodes::LD_IV  => self.ld_iv(),
-            Opcodes::LD_FV  => self.ld_fv(),
-            Opcodes::LD_IA  => self.ld_ia(),
+            Opcodes::SUB => self.sub(),
+            Opcodes::SUBN => self.subn(),
+            Opcodes::XOR => self.xor(),
+            Opcodes::AND => self.and(),
+            Opcodes::LD_VB => self.ld_vb(),
+            Opcodes::LD_BV => self.ld_bv(),
+            Opcodes::LD_VV => self.ld_vv(),
+            Opcodes::LD_VI => self.ld_vi(),
+            Opcodes::LD_VK => self.ld_vk(),
+            Opcodes::LD_IV => self.ld_iv(),
+            Opcodes::LD_FV => self.ld_fv(),
+            Opcodes::LD_IA => self.ld_ia(),
             Opcodes::LD_VDT => self.ld_vdt(),
             Opcodes::LD_DTV => self.ld_dtv(),
             Opcodes::LD_STV => self.ld_stv(),
-            Opcodes::SHL    => self.shl(),
-            Opcodes::SKP    => self.skp(),
-            Opcodes::SKNP   => self.sknp(),
-            Opcodes::RND    => self.rnd(),
-            Opcodes::SHR    => self.shr(),
-            Opcodes::DRW    => self.drw(),
-            _               => panic!("Unrecognized opcode: {:#x}", self.inst.opcode),
+            Opcodes::SHL => self.shl(),
+            Opcodes::SKP => self.skp(),
+            Opcodes::SKNP => self.sknp(),
+            Opcodes::RND => self.rnd(),
+            Opcodes::SHR => self.shr(),
+            Opcodes::DRW => self.drw(),
+            _ => panic!("Unrecognized opcode: {:#x}", self.inst.opcode),
         }
 
-        if !self.jmp { self.inc_pc(); }
+        if !self.jmp {
+            self.inc_pc();
+        }
 
-        if self.dt > 0 { self.dt -= 1; }
-        if self.st > 0 { self.st -= 1; }
+        if self.dt > 0 {
+            self.dt -= 1;
+        }
+        if self.st > 0 {
+            self.st -= 1;
+        }
     }
 
     fn set_pc(&mut self, addr: u16) {
@@ -182,7 +189,7 @@ impl<'a> Chip8<'a> {
     fn se_vb(&mut self) {
         if self.regs[self.inst.x] == self.inst.kk {
             self.inc_pc();
-        } 
+        }
     }
 
     fn se_vv(&mut self) {
@@ -222,12 +229,12 @@ impl<'a> Chip8<'a> {
         let y = self.regs[self.inst.y] as u16;
 
         let res = x + y;
-        self.regs[0xF]   = (res > 255) as u8;
+        self.regs[0xF] = (res > 255) as u8;
         self.regs[idx_x] = res as u8;
     }
 
     fn add_iv(&mut self) {
-        let x   = self.regs[self.inst.x] as u16;
+        let x = self.regs[self.inst.x] as u16;
         self.regs[0xF] = ((self.i + x) > 255) as u8;
         self.i += x;
     }
@@ -255,7 +262,7 @@ impl<'a> Chip8<'a> {
 
     fn shr(&mut self) {
         let idx_x = self.inst.x;
-        let x     = self.regs[idx_x];
+        let x = self.regs[idx_x];
         self.regs[0xF] = x & 0x1;
         self.regs[idx_x] = x >> 1;
     }
@@ -279,9 +286,9 @@ impl<'a> Chip8<'a> {
     fn ld_bv(&mut self) {
         let x = self.regs[self.inst.x];
 
-        self.mem[self.i as usize]     = x / 100;
+        self.mem[self.i as usize] = x / 100;
         self.mem[self.i as usize + 1] = (x / 100) % 10;
-        self.mem[self.i as usize + 2] = (x % 100) % 10; 
+        self.mem[self.i as usize + 2] = (x % 100) % 10;
     }
 
     fn ld_fv(&mut self) {
@@ -293,7 +300,7 @@ impl<'a> Chip8<'a> {
         let x = self.inst.x as usize;
 
         for i in 0usize..x {
-            self.regs[i] = self.mem[self.i as usize + i];  
+            self.regs[i] = self.mem[self.i as usize + i];
         }
     }
 
@@ -301,7 +308,7 @@ impl<'a> Chip8<'a> {
         let x = self.inst.x as usize;
 
         for i in 0usize..x {
-            self.mem[self.i as usize + i] = self.regs[i]; 
+            self.mem[self.i as usize + i] = self.regs[i];
         }
     }
 
@@ -353,28 +360,29 @@ impl<'a> Chip8<'a> {
             let px = self.mem[(self.i + i as u16) as usize];
             for j in 0..8 {
                 if px & (0x80 >> j) != 0 {
-                    let mut offset = (x+j+(y+i)*64) as u16;
+                    let mut offset = (x + j + (y + i) * 64) as u16;
 
-                    offset = if offset >= 64*32 { 
-                        64*32-1 
+                    offset = if offset >= 64 * 32 {
+                        64 * 32 - 1
                     } else {
                         offset
                     };
 
                     if self.screen.buffer[offset as usize] == 1 {
                         self.regs[0xF] = 1;
-                    }               
+                    }
                     self.screen.buffer[offset as usize] ^= 1;
                 }
-            } 
-        } 
+            }
+        }
 
-        for i in 0usize..32*10 {
-            for j in 0usize..64*10 {
-                if self.screen.buffer[(j/10)+(i/10)*64] == 1 {
-                    self.screen.renderer.fill_rect(
-                        Rect::new(j as i32, i as i32, 1, 1)
-                        ).unwrap();
+        for i in 0usize..32 * 10 {
+            for j in 0usize..64 * 10 {
+                if self.screen.buffer[(j / 10) + (i / 10) * 64] == 1 {
+                    self.screen
+                        .renderer
+                        .fill_rect(Rect::new(j as i32, i as i32, 1, 1))
+                        .unwrap();
                 }
             }
         }
@@ -384,7 +392,7 @@ impl<'a> Chip8<'a> {
 
     fn skp(&mut self) {
         let x = self.regs[self.inst.x];
-        if self.keys[x as usize] == 1{
+        if self.keys[x as usize] == 1 {
             self.inc_pc();
         }
     }
@@ -396,7 +404,7 @@ impl<'a> Chip8<'a> {
         }
     }
     pub fn reset_keys(&mut self) {
-        self.keys = [0;16];
+        self.keys = [0; 16];
     }
 
     pub fn press(&mut self, key: u8) {
