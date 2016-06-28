@@ -2,7 +2,10 @@
 
 use std::path::Path;
 use std::fs::File;
+
+use std::io;
 use std::io::Read;
+
 use std::fmt::{Debug, Formatter, Result as FmtResult};
 
 use rand::{thread_rng, Rng};
@@ -72,10 +75,10 @@ impl<'a> Chip8<'a> {
         }
     }
 
-    pub fn load_rom<P: AsRef<Path>>(&mut self, path: P) {
+    pub fn load_rom<P: AsRef<Path>>(&mut self, path: P) -> io::Result<()> {
         let mut rom: Vec<u8> = Vec::new();
-        let mut file = File::open(path).unwrap();
-        file.read_to_end(&mut rom).unwrap();
+        let mut file = try!(File::open(path));
+        try!(file.read_to_end(&mut rom));
         for (i, &item) in rom.iter().enumerate() {
             let val = 0x200;
             self.mem[val + i] = item;
@@ -85,6 +88,7 @@ impl<'a> Chip8<'a> {
             let val = 0x00;
             self.mem[val + i] = item;
         }
+        Ok(())
     }
 
     pub fn run(&mut self) {

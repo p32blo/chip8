@@ -56,7 +56,7 @@ fn main() {
     let mut chip8 = Chip8::new(&ctx);
     let mut events = ctx.event_pump().unwrap();
 
-    chip8.load_rom(&path);
+    chip8.load_rom(&path).unwrap();
 
     'main: loop {
         for event in events.poll_iter() {
